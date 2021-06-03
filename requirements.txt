@@ -1,0 +1,7 @@
+binance
+pandas
+numpy
+python_dateutil
+sqlalchemy
+python-binance
+psycopg2

@@ -1,0 +1,5 @@
+user.cfg
+data/*
+.idea/*
+**/*pyc
+*.html
