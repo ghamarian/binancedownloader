@@ -1,3 +1,10 @@
 [binance_user_config]
 api_key=4rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrL5
 api_secret_key=Fwwwvwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwh
+
+[database_config]
+db_url=postgresql://amir@localhost:5432/postgres
+
+[data_config]
+path=../data
+

@@ -2,13 +2,12 @@ import math
 import os
 from datetime import datetime, timedelta
 
+import pandas as pd
 import psycopg2
 from binance.client import Client
 from dateutil.parser import parse
-import pandas as pd
-from sqlalchemy import create_engine, String, Text
+from sqlalchemy import create_engine
 from sqlalchemy.exc import IntegrityError
-from pathlib import Path
 
 from src.binancedownloader.config import Config
 
