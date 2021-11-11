@@ -13,6 +13,7 @@ for fname in glob.glob(os.path.join('../data', '*.csv')):
            .asfreq(freq='1Min')
            .interpolate('linear', axis=0)
            .fillna(method='bfill')
+           .reset_index()
            )
     print(len(ddf))
     ddf.to_csv(os.path.join('../data_2', fname.split(os.sep)[-1]), index=False)
