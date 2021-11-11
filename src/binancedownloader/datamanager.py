@@ -1,6 +1,7 @@
 import math
 import os
 from datetime import datetime, timedelta
+from pathlib import Path
 
 import pandas as pd
 import psycopg2
@@ -48,30 +49,33 @@ class DataManager:
                                                            kline_size,
                                                            start_date.strftime(DATE_MINUTE_FORMAT),
                                                            end_date.strftime(DATE_MINUTE_FORMAT))
-        data = pd.DataFrame(klines,
-                            columns=['date',
-                                     'open',
-                                     'high',
-                                     'low',
-                                     'close',
-                                     'volume',
-                                     'close_time',
-                                     'quote_av',
-                                     'trades',
-                                     'tb_base_av',
-                                     'tb_quote_av',
-                                     'ignore'])
-        data['date'] = pd.to_datetime(data['date'], unit='ms')
-        data['open'] = pd.to_numeric(data['open'])
-        data.drop(['close_time',
-                   'quote_av',
-                   'trades',
-                   'tb_base_av',
-                   'tb_quote_av',
-                   'ignore'], axis='columns', inplace=True)
-        data.loc[:, 'currency_code'] = symbol
+        if len(klines) > 0:
+            data = pd.DataFrame(klines,
+                                columns=['date',
+                                         'open',
+                                         'high',
+                                         'low',
+                                         'close',
+                                         'volume',
+                                         'close_time',
+                                         'quote_av',
+                                         'trades',
+                                         'tb_base_av',
+                                         'tb_quote_av',
+                                         'ignore'])
+            data['date'] = pd.to_datetime(data['date'], unit='ms')
+            data['open'] = pd.to_numeric(data['open'])
+            data.drop(['close_time',
+                       'quote_av',
+                       'trades',
+                       'tb_base_av',
+                       'tb_quote_av',
+                       'ignore'], axis='columns', inplace=True)
+            data.loc[:, 'currency_code'] = symbol
 
-        return data, end_date
+            return data, end_date
+        else:
+            return None, end_date
 
     def get_all_binance_in_csv(self, symbol, kline_size, save=False):
         filename = f'{symbol}-{kline_size}-data.csv'
@@ -87,16 +91,19 @@ class DataManager:
             print(f'Downloading all available {kline_size} data for {symbol}. Be patient..!')
         else:
             print(
-                f'Downloading {delta_min} minutes of new data available for {symbol}, i.e. {available_data} instances of {kline_size} data.')
+                f'Downloading {delta_min} minutes of new data available for {symbol}, '
+                f'i.e. {available_data} instances of {kline_size} data.')
         while oldest_point < newest_point:
             minutes = NUMBER_OF_TICKERS * bin_sizes[kline_size]
             end_date = min(oldest_point + timedelta(minutes=minutes), datetime.now())
             print(f'Downloading ({minutes} minutes) from {oldest_point} till {end_date.strftime(DATE_MINUTE_FORMAT)}')
             data, oldest_point = self.get_batch_of_tickers_in_csv(symbol, kline_size, oldest_point, minutes)
-            data_df = data_df.append(data)
+            if data is not None:
+                data_df = data_df.append(data)
 
         data_df.set_index('date', inplace=True)
         if save:
+            Path(self.config.data_path).mkdir(parents=True, exist_ok=True)
             data_df.to_csv(filename)
         print('All caught up..!')
         return data_df
